@@ -101,7 +101,10 @@
             [ec2-user@server .ssh]$ sudo systemctl restart sshd.service
             ```
 
-        2. 그럼 client에서는 22번으로는 Connection refused가 발생하고 변경된 port로 접속할 수 있게 된다.
+        2. 그럼 client에서는 22번으로는 Connection refused가 발생하고 변경된 port로 접속할 수 있게 된다.  
+            **!!!!!주의주의!!!!!**  
+            22번 포트는 바로 `connection refused` 에러가 뜬느데 2022번 포트는 한참 뒤에 `connection timed out`이 떠서 뭐지 했는데 **보안그룹**은 안열어줬었다.  
+            **Inbound 규칙으로 2022번을 반드시 열어줄 것!**
 
             ```bash
             [ec2-user@client ~]$ ssh ec2-user@3.34.177.229 -p 22
