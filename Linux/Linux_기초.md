@@ -113,7 +113,154 @@
             [ec2-user@client ~]$ ssh ec2-user@3.34.177.229 -p 2022
             ```
 2. 현재 사용 중인 리눅스의 파일 시스템을 조회하는 명령어를 입력하고 결과를 작성해주세요.
+    - df: 디스크 공간의 사용 현황 (H: 1000단위로 용량 계산, T: 파일 타입 조회)
+        ```bash
+        [ec2-user@study ~]$ df -HT
+        Filesystem     Type      Size  Used Avail Use% Mounted on
+        devtmpfs       devtmpfs  491M     0  491M   0% /dev
+        tmpfs          tmpfs     500M     0  500M   0% /dev/shm
+        tmpfs          tmpfs     500M  418k  500M   1% /run
+        tmpfs          tmpfs     500M     0  500M   0% /sys/fs/cgroup
+        /dev/xvda1     xfs       8.6G  1.9G  6.8G  22% /
+        tmpfs          tmpfs     100M     0  100M   0% /run/user/1000
+        ```
+    - lsblk: 블록 디바이스(하드 드라이브, 플래시 드라이브 등)의 리스트
+        ```bash
+        [ec2-user@study ~]$ lsblk
+        NAME    MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+        xvda    202:0    0   8G  0 disk
+        └─xvda1 202:1    0   8G  0 part /
+        ```
+    - fdisk -l: 시스템에 연결된 모든 파티션의 리스트
+        ```bash
+        [ec2-user@study ~]$ fdisk -l
+        fdisk: cannot open /dev/xvda: Permission denied
+        [ec2-user@study ~]$ sudo fdisk -l
+        Disk /dev/xvda: 8 GiB, 8589934592 bytes, 16777216 sectors
+        Units: sectors of 1 * 512 = 512 bytes
+        Sector size (logical/physical): 512 bytes / 512 bytes
+        I/O size (minimum/optimal): 512 bytes / 512 bytes
+        Disklabel type: gpt
+        Disk identifier: 465F350B-EC19-47A2-9A1D-44ECF9FF38AC
+
+        Device       Start      End  Sectors Size Type
+        /dev/xvda1    4096 16777182 16773087   8G Linux filesystem
+        /dev/xvda128  2048     4095     2048   1M BIOS boot
+
+        Partition table entries are not in disk order.
+        ```
+    - mount: 현재 시스템에 마운트된 파일 시스템의 리스트
+        ```bash
+        [ec2-user@study ~]$ mount
+        sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+        proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+        devtmpfs on /dev type devtmpfs (rw,nosuid,size=479000k,nr_inodes=119750,mode=755)
+        securityfs on /sys/kernel/security type securityfs (rw,nosuid,nodev,noexec,relatime)
+        tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev)
+        devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000)
+        tmpfs on /run type tmpfs (rw,nosuid,nodev,mode=755)
+        tmpfs on /sys/fs/cgroup type tmpfs (ro,nosuid,nodev,noexec,mode=755)
+        cgroup on /sys/fs/cgroup/systemd type cgroup (rw,nosuid,nodev,noexec,relatime,xattr,release_agent=/usr/lib/systemd/systemd-cgroups-agent,name=systemd)
+        pstore on /sys/fs/pstore type pstore (rw,nosuid,nodev,noexec,relatime)
+        cgroup on /sys/fs/cgroup/net_cls,net_prio type cgroup (rw,nosuid,nodev,noexec,relatime,net_cls,net_prio)
+        cgroup on /sys/fs/cgroup/memory type cgroup (rw,nosuid,nodev,noexec,relatime,memory)
+        cgroup on /sys/fs/cgroup/cpu,cpuacct type cgroup (rw,nosuid,nodev,noexec,relatime,cpu,cpuacct)
+        cgroup on /sys/fs/cgroup/blkio type cgroup (rw,nosuid,nodev,noexec,relatime,blkio)
+        cgroup on /sys/fs/cgroup/hugetlb type cgroup (rw,nosuid,nodev,noexec,relatime,hugetlb)
+        cgroup on /sys/fs/cgroup/pids type cgroup (rw,nosuid,nodev,noexec,relatime,pids)
+        cgroup on /sys/fs/cgroup/freezer type cgroup (rw,nosuid,nodev,noexec,relatime,freezer)
+        cgroup on /sys/fs/cgroup/cpuset type cgroup (rw,nosuid,nodev,noexec,relatime,cpuset)
+        cgroup on /sys/fs/cgroup/perf_event type cgroup (rw,nosuid,nodev,noexec,relatime,perf_event)
+        cgroup on /sys/fs/cgroup/devices type cgroup (rw,nosuid,nodev,noexec,relatime,devices)
+        /dev/xvda1 on / type xfs (rw,noatime,attr2,inode64,logbufs=8,logbsize=32k,noquota)
+        systemd-1 on /proc/sys/fs/binfmt_misc type autofs (rw,relatime,fd=28,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=12935)
+        mqueue on /dev/mqueue type mqueue (rw,relatime)
+        debugfs on /sys/kernel/debug type debugfs (rw,relatime)
+        hugetlbfs on /dev/hugepages type hugetlbfs (rw,relatime,pagesize=2M)
+        sunrpc on /var/lib/nfs/rpc_pipefs type rpc_pipefs (rw,relatime)
+        tmpfs on /run/user/1000 type tmpfs (rw,nosuid,nodev,relatime,size=97560k,mode=700,uid=1000,gid=1000)
+        ```
+    - /etc/fstab: 시스템 부팅 시 자동으로 마운트될 파일 시스템의 리스트
+        ```bash
+        [ec2-user@study ~]$ cat /etc/fstab
+        #
+        UUID=92462e9b-de38-4177-8f96-ab97410b4979     /           xfs    defaults,noatime  1   1
+        ```
+    - /etc/mtab: 현재 시스템에 실제로 마운트된 파일 시스템의 리스트 (/proc/mounts를 가르키는 심볼릭링크)
+        ```bash
+        [ec2-user@study ~]$ cat /etc/mtab
+        sysfs /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
+        proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+        devtmpfs /dev devtmpfs rw,nosuid,size=479000k,nr_inodes=119750,mode=755 0 0
+        securityfs /sys/kernel/security securityfs rw,nosuid,nodev,noexec,relatime 0 0
+        tmpfs /dev/shm tmpfs rw,nosuid,nodev 0 0
+        devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000 0 0
+        tmpfs /run tmpfs rw,nosuid,nodev,mode=755 0 0
+        tmpfs /sys/fs/cgroup tmpfs ro,nosuid,nodev,noexec,mode=755 0 0
+        cgroup /sys/fs/cgroup/systemd cgroup rw,nosuid,nodev,noexec,relatime,xattr,release_agent=/usr/lib/systemd/systemd-cgroups-agent,name=systemd 0 0
+        pstore /sys/fs/pstore pstore rw,nosuid,nodev,noexec,relatime 0 0
+        cgroup /sys/fs/cgroup/net_cls,net_prio cgroup rw,nosuid,nodev,noexec,relatime,net_cls,net_prio 0 0
+        cgroup /sys/fs/cgroup/memory cgroup rw,nosuid,nodev,noexec,relatime,memory 0 0
+        cgroup /sys/fs/cgroup/cpu,cpuacct cgroup rw,nosuid,nodev,noexec,relatime,cpu,cpuacct 0 0
+        cgroup /sys/fs/cgroup/blkio cgroup rw,nosuid,nodev,noexec,relatime,blkio 0 0
+        cgroup /sys/fs/cgroup/hugetlb cgroup rw,nosuid,nodev,noexec,relatime,hugetlb 0 0
+        cgroup /sys/fs/cgroup/pids cgroup rw,nosuid,nodev,noexec,relatime,pids 0 0
+        cgroup /sys/fs/cgroup/freezer cgroup rw,nosuid,nodev,noexec,relatime,freezer 0 0
+        cgroup /sys/fs/cgroup/cpuset cgroup rw,nosuid,nodev,noexec,relatime,cpuset 0 0
+        cgroup /sys/fs/cgroup/perf_event cgroup rw,nosuid,nodev,noexec,relatime,perf_event 0 0
+        cgroup /sys/fs/cgroup/devices cgroup rw,nosuid,nodev,noexec,relatime,devices 0 0
+        /dev/xvda1 / xfs rw,noatime,attr2,inode64,logbufs=8,logbsize=32k,noquota 0 0
+        systemd-1 /proc/sys/fs/binfmt_misc autofs rw,relatime,fd=28,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=12935 0 0
+        mqueue /dev/mqueue mqueue rw,relatime 0 0
+        debugfs /sys/kernel/debug debugfs rw,relatime 0 0
+        hugetlbfs /dev/hugepages hugetlbfs rw,relatime,pagesize=2M 0 0
+        sunrpc /var/lib/nfs/rpc_pipefs rpc_pipefs rw,relatime 0 0
+        tmpfs /run/user/1000 tmpfs rw,nosuid,nodev,relatime,size=97560k,mode=700,uid=1000,gid=1000 0 0
+        [ec2-user@study ~]$ ll /etc/mtab
+        lrwxrwxrwx 1 root root 19 Oct 23 18:23 /etc/mtab -> ../proc/self/mounts
+        ```
+    - /proc/mounts: 현재 시스템에 실제로 마운트된 파일 시스템의 리스트 ('/etc/mtab' 파일과 유사하지만 파일이 메모리에 저장되면서 실시간 업데이트됨)
+        ```bash
+        [ec2-user@study ~]$ cat /proc/mounts
+        # /etc/mtab 내용과 동일
+        ```
+    - stat: 파일이나 파일 시스템의 상태 (예를 들어, stat myfile.txt는 'myfile.txt' 파일의 상태를 보여줌)
+        ```bash
+        [ec2-user@study ~]$ stat .
+        File: ‘.’
+        Size: 95              Blocks: 0          IO Block: 4096   directory
+        Device: ca01h/51713d    Inode: 13109597    Links: 3
+        Access: (0700/drwx------)  Uid: ( 1000/ec2-user)   Gid: ( 1000/ec2-user)
+        Access: 2023-11-02 01:08:53.581775029 +0000
+        Modify: 2023-11-02 03:16:35.310453685 +0000
+        Change: 2023-11-02 03:16:35.310453685 +0000
+        Birth: -
+        ```
 3. 최상위 루트 디렉토리('/')의 하위 디렉토리를 간략하게 설명해주세요.
+    ```bash
+    [ec2-user@study ~]$ ll /
+    total 16
+    lrwxrwxrwx   1 root root    7 Oct 23 18:22 bin -> usr/bin
+    dr-xr-xr-x   4 root root 4096 Oct 23 18:24 boot
+    drwxr-xr-x  15 root root 2900 Nov  2 01:08 dev
+    drwxr-xr-x  81 root root 8192 Nov 11 12:31 etc
+    drwxr-xr-x   4 root root   38 Nov  2 01:09 home
+    lrwxrwxrwx   1 root root    7 Oct 23 18:22 lib -> usr/lib
+    lrwxrwxrwx   1 root root    9 Oct 23 18:22 lib64 -> usr/lib64
+    drwxr-xr-x   2 root root    6 Oct 23 18:22 local
+    drwxr-xr-x   2 root root    6 Apr  9  2019 media
+    drwxr-xr-x   2 root root    6 Apr  9  2019 mnt
+    drwxr-xr-x   4 root root   27 Oct 23 18:23 opt
+    dr-xr-xr-x 153 root root    0 Nov  2 01:08 proc
+    dr-xr-x---   3 root root  103 Nov  2 01:08 root
+    drwxr-xr-x  28 root root  980 Nov 11 01:23 run
+    lrwxrwxrwx   1 root root    8 Oct 23 18:22 sbin -> usr/sbin
+    drwxr-xr-x   2 root root    6 Apr  9  2019 srv
+    dr-xr-xr-x  13 root root    0 Nov  2 01:08 sys
+    drwxrwxrwt   8 root root  212 Nov 11 14:34 tmp
+    drwxr-xr-x  13 root root  155 Oct 23 18:22 usr
+    drwxr-xr-x  19 root root  269 Nov  2 01:08 var
+    ```
     - /bin
     - /dev
     - /etc
